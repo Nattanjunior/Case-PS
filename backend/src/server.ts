@@ -1,19 +1,25 @@
-import fastify from 'fastify'
 
-const app = fastify()
+import Fastify from 'fastify'
+import cors from '@fastify/cors'
+import { clientRoutes } from './routes/client.routes'
+import { assetRoutes } from './routes/asset.routes'
+import dotenv from 'dotenv'
 
-app.get('/', async (request, reply) => {
-  return { hello: 'world' }
-})
+dotenv.config()
 
-const start = async () => {
-  try {
-    await app.listen({ port: 3333 })
-    console.log('Server running on port 3333')
-  } catch (err) {
-    app.log.error(err)
+export const app = Fastify()
+
+app.register(cors)
+app.register(clientRoutes)
+app.register(assetRoutes)
+
+
+const PORT = process.env.PORT || 3333
+
+app.listen({ port: Number(PORT) }, (err, address) => {
+  if (err) {
+    console.error(err)
     process.exit(1)
   }
-}
-
-start()
+  console.log(`🚀 Server listening at ${address}`)
+})
