@@ -1,19 +1,44 @@
+import { PrismaClient, Status } from '@prisma/client'
+import { CreateClientDTO, UpdateClientDTO } from '../dtos/client.dto'
+import { validateEmail } from './email.service'
 import { prisma } from '../lib/prisma'
 
-export const createClient = async (name: string, email: string, status: 'ACTIVE' | 'INACTIVE') => {
+
+
+export async function createClient(data: CreateClientDTO) {
+  const emailValidation = await validateEmail(data.email)
+  if (!emailValidation.isValid) {
+    throw new Error(emailValidation.message)
+  }
+
   return prisma.client.create({
-    data: { name, email, status },
+    data: {
+      name: data.name,
+      email: data.email,
+      status: data.status as Status
+    }
   })
 }
 
-export const getClients = async () => {
+export async function getClients() {
   return prisma.client.findMany()
 }
 
-export const updateClient = async (id: string, data: { name?: string; email?: string; status?: 'ACTIVE' | 'INACTIVE' }) => {
+export async function updateClient(id: string, data: UpdateClientDTO) {
+  if (data.email) {
+    const emailValidation = await validateEmail(data.email)
+    if (!emailValidation.isValid) {
+      throw new Error(emailValidation.message)
+    }
+  }
+
   return prisma.client.update({
     where: { id },
-    data,
+    data: {
+      name: data.name,
+      email: data.email,
+      status: data.status as Status
+    }
   })
 }
 
