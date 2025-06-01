@@ -1,0 +1,60 @@
+POST http://localhost:3333/clients
+Content-Type: application/json
+
+{
+ "name": "Nattan",
+  "email": "hu@email.com",
+  "status": "ACTIVE"
+}
+
+###
+
+GET http://localhost:3333/clients
+
+###
+
+PUT http://localhost:3333/clients/ac481c6c-8fde-4cfd-bef8-c059786bdde1
+Content-Type: application/json
+
+{
+  "name": "Nattan",
+  "email": "nattan@email.com",
+  "status": "INACTIVE"
+}
+
+###
+
+# Listar todos os assets estáticos
+GET http://localhost:3333/assets
+
+###
+
+# Listar assets de um cliente específico
+GET http://localhost:3333/clients/ac481c6c-8fde-4cfd-bef8-c059786bdde1/assets
+
+###
+
+# Criar um novo asset para um cliente
+POST http://localhost:3333/clients/ac481c6c-8fde-4cfd-bef8-c059786bdde1/assets
+Content-Type: application/json
+
+{
+  "name": "Ação Petrobras",
+  "value": 1500.75
+}
+
+###
+
+# Atualizar um asset específico
+PUT http://localhost:3333/clients/ac481c6c-8fde-4cfd-bef8-c059786bdde1/assets/72bdc4d3-45c2-44cc-976a-8c28128dc54f
+Content-Type: application/json
+
+{
+  "name": "Ação Petrobras PN",
+  "value": 1600.50
+}
+
+###
+
+
+
