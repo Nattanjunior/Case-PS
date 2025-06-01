@@ -13,12 +13,11 @@ services:
       - db_data:/var/lib/postgresql/data
 
   backend:
-    build: ./backend
+    build: .
     ports:
       - "3001:3001"
     environment:
       DATABASE_URL: postgresql://postgres:postgres@db:5432/investment_db?schema=public
-
     depends_on:
       - db
 
