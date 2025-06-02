@@ -13,23 +13,34 @@ enum Status {
 }
 
 model Client {
-  id        String   @id @default(uuid())
-  name      String
-  email     String   @unique
-  status    Status   @default(ACTIVE)
-  assets    Asset[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String       @id @default(uuid())
+  name        String
+  email       String       @unique
+  status      Status       @default(ACTIVE)
+  allocations Allocation[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 }
 
 model Asset {
-  id        String   @id @default(uuid())
-  name      String
-  value     Float
-  clientId  String
-  client    Client   @relation(fields: [clientId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String       @id @default(uuid())
+  name        String
+  value       Float
+  allocations Allocation[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
 
-  @@index([clientId])
+model Allocation {
+  id             String   @id @default(uuid())
+  client         Client   @relation(fields: [clientId], references: [id])
+  clientId       String
+  asset          Asset    @relation(fields: [assetId], references: [id])
+  assetId        String
+  quantidade     Int
+  valorInvestido Float
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([clientId, assetId])
 }
