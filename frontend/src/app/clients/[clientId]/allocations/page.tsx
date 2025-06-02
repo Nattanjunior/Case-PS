@@ -38,9 +38,13 @@ export default function ClientAllocationsPage() {
     return <div>Cliente não encontrado.</div>
   }
 
-  // Calcular total investido e quantidade de ativos
   const totalInvested = assets?.reduce((sum, asset) => sum + asset.value, 0) || 0
   const totalAssets = assets?.length || 0
+
+  function handleDeleteClientClick(assetId: string) {
+    console.log('Remover alocação:', assetId)
+    // TODO: implementar exclusão real
+  }
 
   return (
     <div className="space-y-6">
@@ -52,7 +56,6 @@ export default function ClientAllocationsPage() {
       {/* Informações do Cliente */}
       <Card className="shadow-sm">
         <CardContent className="flex items-center gap-4 p-6">
-          {/* Sem imagem do usuário */}
           <div className="flex flex-col">
             <span className="text-lg font-semibold">{client.name}</span>
             <span className="text-gray-600 dark:text-gray-400">{client.email}</span>
@@ -85,25 +88,27 @@ export default function ClientAllocationsPage() {
                   <TableRow key={asset.id} className="hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
                     <TableCell className="font-medium w-[150px]">{asset.name}</TableCell>
                     <TableCell className="w-[100px]">
-                     {new Intl.NumberFormat('pt-BR', {
-                      style: 'currency',
-                      currency: 'BRL'
-                    }).format(asset.value)}
-                  </TableCell>
-                   {/* Coluna de Quantidade (placeholder por enquanto) */}
-                  <TableCell className="w-[100px]">100</TableCell> {/* TODO: Implementar quantidade real */}
-                  <TableCell className="text-right w-[100px]">
-                    {new Intl.NumberFormat('pt-BR', {
-                      style: 'currency',
-                      currency: 'BRL'
-                    }).format(asset.value * 100)} {/* TODO: Calcular valor total real */}
-                  </TableCell>
-                  <TableCell className="text-right w-[80px]">
-                    <Button variant="ghost" size="icon" onClick={() => handleDeleteClientClick(asset.id)} className="text-gray-500 hover:text-gray-700"><TrashIcon className="size-4 w-4 h-4" /></Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
+                      {new Intl.NumberFormat('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL'
+                      }).format(asset.value)}
+                    </TableCell>
+                    <TableCell className="w-[100px]">100</TableCell>
+                    <TableCell className="text-right w-[100px]">
+                      {new Intl.NumberFormat('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL'
+                      }).format(asset.value * 100)}
+                    </TableCell>
+                    <TableCell className="text-right w-[80px]">
+                      <Button variant="ghost" size="icon" onClick={() => handleDeleteClientClick(asset.id)} className="text-gray-500 hover:text-gray-700">
+                        <TrashIcon className="size-4 w-4 h-4" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
         </CardContent>
       </Card>
@@ -137,4 +142,4 @@ export default function ClientAllocationsPage() {
       </div>
     </div>
   )
-} 
+}
