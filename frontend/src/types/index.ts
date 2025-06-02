@@ -34,4 +34,15 @@ export type CreateAssetDTO = {
   value: number
 }
 
-export type UpdateAssetDTO = Partial<CreateAssetDTO> 
+export type UpdateAssetDTO = Partial<CreateAssetDTO>
+
+export type Allocation = {
+  id: string
+  clientId: string
+  assetId: string
+  quantidade: number
+  valorInvestido: number
+  asset: Asset
+  createdAt: string
+  updatedAt: string
+} 
