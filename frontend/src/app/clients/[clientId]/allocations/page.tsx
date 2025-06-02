@@ -3,12 +3,21 @@
 import { useParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { clientsService } from '@/services/clients'
-import { assetsService } from '@/services/assets'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { Client } from '@/types'
 import { TrashIcon } from 'lucide-react'
+import { getAllocationsByClient, deleteAllocation, createAllocation } from '@/services/allocations'
+import { Allocation } from '@/types'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select'
+import { useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
+import { assetsService } from '@/services/assets'
+import { toast } from 'sonner'
 
 export default function ClientAllocationsPage() {
   const params = useParams()
@@ -20,17 +29,27 @@ export default function ClientAllocationsPage() {
     enabled: !!clientId,
   })
 
-  const { data: assets, isLoading: isLoadingAssets, error: errorAssets } = useQuery({
-    queryKey: ['client-assets', clientId],
-    queryFn: () => assetsService.listByClient(clientId),
+  const { data: allocations, isLoading: isLoadingAllocations, error: errorAllocations, refetch } = useQuery<Allocation[]>({
+    queryKey: ['client-allocations', clientId],
+    queryFn: () => getAllocationsByClient(clientId),
     enabled: !!clientId,
   })
 
-  if (isLoadingClient || isLoadingAssets) {
+  const [modalOpen, setModalOpen] = useState(false)
+  const [selectedAssetId, setSelectedAssetId] = useState<string | undefined>(undefined)
+  const [quantidade, setQuantidade] = useState<number>(1)
+  const queryClient = useQueryClient()
+
+  const { data: assetsList, isLoading: isLoadingAssetsList } = useQuery({
+    queryKey: ['assets'],
+    queryFn: assetsService.list
+  })
+
+  if (isLoadingClient || isLoadingAllocations || isLoadingAssetsList) {
     return <div>Carregando alocações...</div>
   }
 
-  if (errorClient || errorAssets) {
+  if (errorClient || errorAllocations) {
     return <div>Erro ao carregar alocações do cliente.</div>
   }
 
@@ -38,22 +57,21 @@ export default function ClientAllocationsPage() {
     return <div>Cliente não encontrado.</div>
   }
 
-  const totalInvested = assets?.reduce((sum, asset) => sum + asset.value, 0) || 0
-  const totalAssets = assets?.length || 0
+  const totalInvested = allocations?.reduce((sum, allocation) => sum + allocation.valorInvestido, 0) || 0
+  const totalAssets = allocations?.length || 0
 
-  function handleDeleteClientClick(assetId: string) {
-    console.log('Remover alocação:', assetId)
-    // TODO: implementar exclusão real
+  async function handleDeleteAllocationClick(allocationId: string) {
+    await deleteAllocation(clientId, allocationId)
+    refetch()
   }
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Alocações de Ativos - {client.name}</h1>
-        <Button className="bg-blue-600 hover:bg-blue-700 text-white whitespace-nowrap">+ Adicionar Alocação</Button>
+        <Button className="bg-blue-600 hover:bg-blue-700 text-white whitespace-nowrap" onClick={() => setModalOpen(true)}>+ Adicionar Alocação</Button>
       </div>
 
-      {/* Informações do Cliente */}
       <Card className="shadow-sm">
         <CardContent className="flex items-center gap-4 p-6">
           <div className="flex flex-col">
@@ -66,7 +84,6 @@ export default function ClientAllocationsPage() {
         </CardContent>
       </Card>
 
-      {/* Tabela de Ativos Alocados */}
       <Card className="shadow-sm">
         <CardHeader>
           <CardTitle>Ativos Alocados</CardTitle>
@@ -84,24 +101,24 @@ export default function ClientAllocationsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {assets?.map((asset) => (
-                  <TableRow key={asset.id} className="hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                    <TableCell className="font-medium w-[150px]">{asset.name}</TableCell>
+                {allocations?.map((allocation) => (
+                  <TableRow key={allocation.id} className="hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                    <TableCell className="font-medium w-[150px]">{allocation.asset.name}</TableCell>
                     <TableCell className="w-[100px]">
                       {new Intl.NumberFormat('pt-BR', {
                         style: 'currency',
                         currency: 'BRL'
-                      }).format(asset.value)}
+                      }).format(allocation.asset.value)}
                     </TableCell>
-                    <TableCell className="w-[100px]">100</TableCell>
+                    <TableCell className="w-[100px]">{allocation.quantidade}</TableCell>
                     <TableCell className="text-right w-[100px]">
                       {new Intl.NumberFormat('pt-BR', {
                         style: 'currency',
                         currency: 'BRL'
-                      }).format(asset.value * 100)}
+                      }).format(allocation.valorInvestido)}
                     </TableCell>
                     <TableCell className="text-right w-[80px]">
-                      <Button variant="ghost" size="icon" onClick={() => handleDeleteClientClick(asset.id)} className="text-gray-500 hover:text-gray-700">
+                      <Button variant="ghost" size="icon" onClick={() => handleDeleteAllocationClick(allocation.id)} className="text-gray-500 hover:text-gray-700">
                         <TrashIcon className="size-4 w-4 h-4" />
                       </Button>
                     </TableCell>
@@ -113,7 +130,6 @@ export default function ClientAllocationsPage() {
         </CardContent>
       </Card>
 
-      {/* Cards de Resumo */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -140,6 +156,68 @@ export default function ClientAllocationsPage() {
           </CardContent>
         </Card>
       </div>
+
+      <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+        <DialogContent className="max-w-md rounded-2xl bg-white dark:bg-zinc-900 p-6">
+          <DialogHeader>
+            <DialogTitle>Adicionar Alocação</DialogTitle>
+          </DialogHeader>
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault()
+              if (!selectedAssetId || quantidade <= 0) {
+                toast.error('Por favor, selecione um ativo e informe a quantidade.')
+                return
+              }
+              const selectedAsset = assetsList?.find(asset => asset.id === selectedAssetId)
+              if (!selectedAsset) {
+                toast.error('Ativo selecionado inválido.')
+                return
+              }
+              const calculatedValorInvestido = selectedAsset.value * quantidade
+
+              try {
+                await createAllocation(clientId, { assetId: selectedAssetId, quantidade, valorInvestido: calculatedValorInvestido })
+                toast.success('Alocação criada com sucesso!')
+                setModalOpen(false)
+                setSelectedAssetId('')
+                setQuantidade(1)
+                queryClient.invalidateQueries({ queryKey: ['client-allocations', clientId] })
+              } catch (error) {
+                toast.error('Erro ao criar alocação. Tente novamente.')
+              }
+            }}
+            className="space-y-4"
+          >
+            <div className="space-y-2">
+              <Label className="text-gray-700 dark:text-gray-300">Ativo</Label>
+              <Select value={selectedAssetId} onValueChange={(value) => {
+                setSelectedAssetId(value)
+              }}>
+                <SelectTrigger className="w-full bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-700">
+                  <SelectValue placeholder="Selecione um ativo" />
+                </SelectTrigger>
+                <SelectContent className="bg-white dark:bg-zinc-900">
+                  {assetsList?.map((asset) => {
+                    return (
+                      <SelectItem key={asset.id} value={asset.id} className="focus:bg-gray-100 dark:focus:bg-zinc-800">
+                        {asset.name}
+                      </SelectItem>
+                    )
+                  })}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="quantidade" className="text-gray-700 dark:text-gray-300">Quantidade</Label>
+              <Input id="quantidade" type="number" min={1} value={quantidade} onChange={e => setQuantidade(Number(e.target.value))} required className="bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-700 text-gray-900 dark:text-white" />
+            </div>
+            <DialogFooter>
+              <Button type="submit" className="bg-blue-600 text-white hover:bg-blue-600">Salvar</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
