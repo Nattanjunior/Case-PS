@@ -5,4 +5,5 @@ export async function clientRoutes(app: FastifyInstance) {
   app.post('/clients', clientController.create)
   app.get('/clients', clientController.list)
   app.put('/clients/:id', clientController.update)
+  app.delete('/clients/:id', clientController.remove)
 }

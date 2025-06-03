@@ -37,3 +37,16 @@ export const update = async (request: FastifyRequest, reply: FastifyReply) => {
     return reply.code(500).send({ error: 'Erro interno do servidor' })
   }
 }
+
+export const remove = async (request: FastifyRequest, reply: FastifyReply) => {
+  try {
+    const { id } = request.params as { id: string }
+    await clientService.deleteClient(id)
+    return reply.code(204).send()
+  } catch (error) {
+    if (error instanceof Error) {
+      return reply.code(400).send({ error: error.message })
+    }
+    return reply.code(500).send({ error: 'Erro interno do servidor' })
+  }
+}
