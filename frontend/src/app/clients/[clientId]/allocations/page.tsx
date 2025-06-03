@@ -199,6 +199,7 @@ export default function ClientAllocationsPage() {
                 </SelectTrigger>
                 <SelectContent className="bg-white dark:bg-zinc-900">
                   {assetsList?.map((asset) => {
+                    console.log('Creating SelectItem for asset:', asset.id, 'Type:', typeof asset.id, asset.name, asset.value)
                     return (
                       <SelectItem key={asset.id} value={asset.id} className="focus:bg-gray-100 dark:focus:bg-zinc-800">
                         {asset.name}
