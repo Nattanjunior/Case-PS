@@ -25,7 +25,15 @@ export async function getClients() {
 }
 
 export async function updateClient(id: string, data: UpdateClientDTO) {
-  if (data.email) {
+  const existingClient = await prisma.client.findUnique({
+    where: { id }
+  })
+
+  if (!existingClient) {
+    throw new Error('Cliente não encontrado')
+  }
+
+  if (data.email && data.email !== existingClient.email) {
     const emailValidation = await validateEmail(data.email)
     if (!emailValidation.isValid) {
       throw new Error(emailValidation.message)
@@ -35,9 +43,9 @@ export async function updateClient(id: string, data: UpdateClientDTO) {
   return prisma.client.update({
     where: { id },
     data: {
-      name: data.name,
-      email: data.email,
-      status: data.status as Status
+      name: data.name ?? existingClient.name,
+      email: data.email ?? existingClient.email,
+      status: (data.status as Status) ?? existingClient.status
     }
   })
 }
