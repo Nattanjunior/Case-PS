@@ -20,7 +20,7 @@ app.register(allocationRoutes)
 
 const PORT = process.env.PORT || 3333
 
-app.listen({ port: Number(PORT) }, (err, address) => {
+app.listen({ port: Number(PORT), host: '0.0.0.0' }, (err, address) => {
   if (err) {
     console.error(err)
     process.exit(1)
