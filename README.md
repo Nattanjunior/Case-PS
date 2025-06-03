@@ -65,12 +65,12 @@ npm install
 cp .env.example .env
 ```
 
-Edite o arquivo `.env` com:
+**Importante:** Certifique-se que o arquivo `.env` do frontend aponta para a porta correta do backend:
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:3001
 ```
 
-### 4. Executando o Backend com Docker
+### 4. Executando com Docker
 
 ```bash
 # Na pasta backend
@@ -91,6 +91,11 @@ docker-compose logs -f backend
 curl http://localhost:3001/clients
 ```
 
+Após subir os containers, se houver um script de seed para popular o banco, execute:
+```bash
+docker-compose exec backend npx prisma db seed
+```
+
 ### 5. Executando o Frontend
 
 ```bash
@@ -100,7 +105,28 @@ npm run dev
 
 O frontend estará disponível em `http://localhost:3000`
 
-### 6. Verificando se tudo está funcionando
+### 6. Executando o Backend Localmente (Alternativa)
+
+```bash
+cd backend
+
+# Instalar dependências (se não fez antes)
+npm install
+
+# Rodar migrações do Prisma
+npx prisma migrate deploy
+
+# Gerar cliente Prisma
+npx prisma generate
+
+# Rodar seed (se existir script)
+npx prisma db seed
+
+# Iniciar o servidor
+npm run dev
+```
+
+### 7. Verificando se tudo está funcionando
 
 1. Backend:
    - Acesse http://localhost:3001/clients
@@ -111,7 +137,7 @@ O frontend estará disponível em `http://localhost:3000`
    - Deve mostrar a interface do sistema
    - Tente criar um novo cliente para testar
 
-### 7. Solução de Problemas
+### 8. Solução de Problemas
 
 Se encontrar problemas:
 
