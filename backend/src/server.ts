@@ -9,7 +9,10 @@ dotenv.config()
 
 export const app = Fastify()
 
-app.register(cors)
+app.register(cors, {
+  origin: '*' , // Ou defina um domínio específico como 'http://localhost:3000'
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+})
 app.register(clientRoutes)
 app.register(assetRoutes)
 app.register(allocationRoutes)
