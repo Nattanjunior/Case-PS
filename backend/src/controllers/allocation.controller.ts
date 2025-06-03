@@ -1,5 +1,5 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
-import { listAllocationsByClient, createAllocation, updateAllocation, deleteAllocation } from '../services/allocation.service'
+import { listAllocationsByClient, createAllocation, deleteAllocation } from '../services/allocation.service'
 
 export const listByClient = async (request: FastifyRequest, reply: FastifyReply) => {
   try {
@@ -22,16 +22,16 @@ export const create = async (request: FastifyRequest, reply: FastifyReply) => {
   }
 }
 
-export const update = async (request: FastifyRequest, reply: FastifyReply) => {
-  try {
-    const { clientId, allocationId } = request.params as { clientId: string, allocationId: string }
-    const { quantidade, valorInvestido } = request.body as { quantidade: number, valorInvestido: number }
-    const allocation = await updateAllocation(allocationId, clientId, { quantidade, valorInvestido })
-    return reply.send(allocation)
-  } catch (error) {
-    return reply.code(500).send({ error: 'Erro ao atualizar alocação' })
-  }
-}
+// export const update = async (request: FastifyRequest, reply: FastifyReply) => {
+//   try {
+//     const { clientId, allocationId } = request.params as { clientId: string, allocationId: string }
+//     const { quantidade, valorInvestido } = request.body as { quantidade: number, valorInvestido: number }
+//     const allocation = await updateAllocation(allocationId, clientId, { quantidade, valorInvestido })
+//     return reply.send(allocation)
+//   } catch (error) {
+//     return reply.code(500).send({ error: 'Erro ao atualizar alocação' })
+//   }
+// }
 
 export const remove = async (request: FastifyRequest, reply: FastifyReply) => {
   try {
