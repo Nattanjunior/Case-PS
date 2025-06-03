@@ -57,8 +57,7 @@ export function ClientFormModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[430px] rounded-2xl shadow-2xl border border-gray-200 bg-white dark:bg-zinc-900 p-8 relative animate-in fade-in zoom-in">
-        {/* Botão de fechar */}
+      <DialogContent className="sm:max-w-[430px] rounded-2xl shadow-2xl border border-gray-200 bg-white dark:bg-zinc-900 p-8 animate-in fade-in zoom-in">
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
