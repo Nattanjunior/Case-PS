@@ -12,13 +12,14 @@ RUN npm install
 
 COPY . .
 
+# Garante que o script tenha permissão de execução
+RUN chmod +x docker-entrypoint.sh && \
+    cp docker-entrypoint.sh /usr/local/bin/ && \
+    chmod +x /usr/local/bin/docker-entrypoint.sh
+
 RUN npx prisma generate
 
 EXPOSE 3001
-
-# Adiciona script de inicialização
-COPY docker-entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["npm", "run", "dev"] 
