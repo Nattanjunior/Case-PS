@@ -49,8 +49,8 @@ cp .env.example .env
 
 Edite o arquivo `.env` com as seguintes variáveis:
 ```env
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/investments?schema=public"
-PORT=3333
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/investment_db?schema=public"
+PORT=3001
 ```
 
 ### 3. Configuração do Frontend
@@ -67,34 +67,77 @@ cp .env.example .env
 
 Edite o arquivo `.env` com:
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:3333
+NEXT_PUBLIC_API_URL=http://localhost:3001
 ```
 
-### 4. Executando com Docker
+### 4. Executando o Backend com Docker
 
 ```bash
-# Na raiz do projeto
+# Na pasta backend
 docker-compose up -d
 ```
 
 Isso irá:
 - Iniciar o PostgreSQL na porta 5432
-- Iniciar o backend na porta 3333
+- Iniciar o backend na porta 3001
 - Aplicar as migrações do Prisma automaticamente
 
-### 5. Executando sem Docker
-
-#### Backend
+Para verificar se o backend está rodando corretamente:
 ```bash
-cd backend
-npm run dev
+# Verificar logs do backend
+docker-compose logs -f backend
+
+# Verificar se a API está respondendo
+curl http://localhost:3001/clients
 ```
 
-#### Frontend
+### 5. Executando o Frontend
+
 ```bash
 cd frontend
 npm run dev
 ```
+
+O frontend estará disponível em `http://localhost:3000`
+
+### 6. Verificando se tudo está funcionando
+
+1. Backend:
+   - Acesse http://localhost:3001/clients
+   - Deve retornar uma lista (vazia inicialmente) de clientes
+
+2. Frontend:
+   - Acesse http://localhost:3000
+   - Deve mostrar a interface do sistema
+   - Tente criar um novo cliente para testar
+
+### 7. Solução de Problemas
+
+Se encontrar problemas:
+
+1. Backend não inicia:
+   ```bash
+   # Verificar logs
+   docker-compose logs backend
+   
+   # Reiniciar containers
+   docker-compose down
+   docker-compose up -d
+   ```
+
+2. Frontend não conecta ao backend:
+   - Verifique se o backend está rodando
+   - Confirme se a URL no .env do frontend está correta
+   - Verifique se não há bloqueio de CORS
+
+3. Banco de dados:
+   ```bash
+   # Verificar status do banco
+   docker-compose ps db
+   
+   # Verificar logs do banco
+   docker-compose logs db
+   ```
 
 ## 📚 Documentação da API
 
