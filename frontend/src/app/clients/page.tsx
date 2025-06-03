@@ -93,7 +93,7 @@ export default function ClientsPage() {
     <div className="space-y-8">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Clientes</h1>
-        <Button onClick={handleNewClient}>Novo Cliente</Button>
+        <Button onClick={handleNewClient} className="bg-blue-600 hover:bg-blue-700 text-white whitespace-nowrap">Novo Cliente</Button>
       </div>
 
       <Card>
@@ -101,61 +101,63 @@ export default function ClientsPage() {
           <CardTitle>Lista de Clientes</CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nome</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {clients?.map((client) => (
-                <TableRow key={client.id}>
-                  <TableCell>
-                    <span
-                      className="cursor-pointer text-blue-600 hover:underline"
-                      onClick={() => router.push(`/clients/${client.id}/allocations`)}
-                    >
-                      {client.name}
-                    </span>
-                  </TableCell>
-                  <TableCell>{client.email}</TableCell>
-                  <TableCell>
-                    <span className={`px-2 py-1 rounded-full text-xs ${
-                      client.status === 'ACTIVE' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                    }`}>
-                      {client.status === 'ACTIVE' ? 'Ativo' : 'Inativo'}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleEditClient(client)}
-                        className="text-blue-600 hover:bg-blue-100 hover:text-blue-800"
-                        title="Editar"
-                      >
-                        <Pencil className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleDeleteClient(client)}
-                        className="text-red-600 hover:bg-red-100 hover:text-red-800"
-                        disabled={isDeleting && clientToDelete?.id === client.id}
-                        title="Excluir"
-                      >
-                        <Trash className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
+          <div className="overflow-x-auto max-h-[400px] overflow-y-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Nome</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Ações</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {clients?.map((client) => (
+                  <TableRow key={client.id}>
+                    <TableCell>
+                      <span
+                        className="cursor-pointer text-blue-600 hover:underline"
+                        onClick={() => router.push(`/clients/${client.id}/allocations`)}
+                      >
+                        {client.name}
+                      </span>
+                    </TableCell>
+                    <TableCell>{client.email}</TableCell>
+                    <TableCell>
+                      <span className={`px-2 py-1 rounded-full text-xs ${
+                        client.status === 'ACTIVE' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                      }`}>
+                        {client.status === 'ACTIVE' ? 'Ativo' : 'Inativo'}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleEditClient(client)}
+                          className="text-blue-600 hover:bg-blue-100 hover:text-blue-800"
+                          title="Editar"
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDeleteClient(client)}
+                          className="text-red-600 hover:bg-red-100 hover:text-red-800"
+                          disabled={isDeleting && clientToDelete?.id === client.id}
+                          title="Excluir"
+                        >
+                          <Trash className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
       <ClientFormModal
