@@ -3,8 +3,6 @@ import { CreateClientDTO, UpdateClientDTO } from '../dtos/client.dto'
 import { validateEmail } from './email.service'
 import { prisma } from '../lib/prisma'
 
-
-
 export async function createClient(data: CreateClientDTO) {
   const emailValidation = await validateEmail(data.email)
   if (!emailValidation.isValid) {
@@ -51,7 +49,15 @@ export async function updateClient(id: string, data: UpdateClientDTO) {
 }
 
 export const deleteClient = async (id: string) => {
-  return prisma.client.delete({
-    where: { id },
-  })
-}
+  try {
+    return await prisma.client.delete({
+      where: { id },
+    });
+  } catch (error: any) {
+    if (error.code === 'P2003') {
+      throw new Error('Este cliente possui alocações ou outros dados relacionados e não pode ser excluído diretamente.');
+    }
+    
+    throw error;
+  }
+};
