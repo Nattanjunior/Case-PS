@@ -74,13 +74,21 @@ NEXT_PUBLIC_API_URL=http://localhost:3001
 
 ```bash
 # Na pasta backend
+cd backend
+
+# Construir a imagem do backend
+docker-compose build
+
+# Iniciar os containers
 docker-compose up -d
 ```
 
 Isso irá:
+- Construir a imagem do backend
 - Iniciar o PostgreSQL na porta 5432
 - Iniciar o backend na porta 3001
 - Aplicar as migrações do Prisma automaticamente
+- Executar o seed do banco de dados automaticamente
 
 Para verificar se o backend está rodando corretamente:
 ```bash
@@ -89,11 +97,6 @@ docker-compose logs -f backend
 
 # Verificar se a API está respondendo
 curl http://localhost:3001/clients
-```
-
-Após subir os containers, se houver um script de seed para popular o banco, execute:
-```bash
-docker-compose exec backend npx prisma db seed
 ```
 
 ### 5. Executando o Frontend
@@ -118,9 +121,6 @@ npx prisma migrate deploy
 
 # Gerar cliente Prisma
 npx prisma generate
-
-# Rodar seed (se existir script)
-npx prisma db seed
 
 # Iniciar o servidor
 npm run dev
@@ -148,6 +148,7 @@ Se encontrar problemas:
    
    # Reiniciar containers
    docker-compose down
+   docker-compose build
    docker-compose up -d
    ```
 
